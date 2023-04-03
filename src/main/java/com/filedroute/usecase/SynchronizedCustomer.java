@@ -1,13 +1,21 @@
 package com.filedroute.usecase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.filedroute.converter.ConvertCustomerLocaltoCustomerRemote;
+import com.filedroute.converter.ConvertCustomerRemotetoCustomerLocal;
 import com.filedroute.entity.CustomerLocal;
 import com.filedroute.entity.CustomerRemote;
 
 import java.util.*;
 
 public class SynchronizedCustomer {
-    ObjectMapper oMapper = new ObjectMapper();
+    private static ObjectMapper oMapper = new ObjectMapper();
+    {
+        oMapper.registerModule(new JavaTimeModule());
+        oMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     public Map<String, List<Map<String, String>>> synchronizeCustomer(List<CustomerLocal> listCustomerLocal, List<CustomerRemote> listCustomerRemote) {
         Map<String, List<Map<String, String>>> result = new HashMap<>();
@@ -23,19 +31,21 @@ public class SynchronizedCustomer {
                 found = true;
                 if (local.getDateUpdated().isAfter(customerRemote.get().getDateUpdated())) {
                     Map<String, String> remoteUpdate = new HashMap<>();
-                    remoteUpdate = oMapper.convertValue(local, Map.class);
+                    remoteUpdate = oMapper.convertValue(ConvertCustomerLocaltoCustomerRemote.convert(local), Map.class);
                     remoteUpdates.add(remoteUpdate);
                 } else {
                     Map<String, String> localUpdate = new HashMap<>();
-                    localUpdate = oMapper.convertValue(customerRemote.get(), Map.class);
+                    localUpdate = oMapper.convertValue(ConvertCustomerRemotetoCustomerLocal.convert(customerRemote.get()), Map.class);
                     localUpdates.add(localUpdate);
                 }
             }
             //  }
             if (!found) {
                 Map<String, String> remoteUpdate = new HashMap<>();
-                remoteUpdate = oMapper.convertValue(local, Map.class);
+                remoteUpdate = oMapper.convertValue(ConvertCustomerLocaltoCustomerRemote.convert(local), Map.class);
+
                 remoteUpdates.add(remoteUpdate);
+
             }
         }
         for (CustomerRemote remote : listCustomerRemote) {
@@ -48,7 +58,7 @@ public class SynchronizedCustomer {
             }
             //}
             if (!found) {
-                Map<String, String> localUpdate = oMapper.convertValue(remote, Map.class);
+                Map<String, String> localUpdate = oMapper.convertValue(ConvertCustomerRemotetoCustomerLocal.convert(remote), Map.class);
                 localUpdates.add(localUpdate);
             }
         }

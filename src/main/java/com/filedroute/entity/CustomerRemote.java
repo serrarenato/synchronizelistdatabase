@@ -61,6 +61,7 @@ public class CustomerRemote extends Customer{
                 ", CustomerCity='" + CustomerCity + '\'' +
                 ", CustomerState='" + CustomerState + '\'' +
                 ", CustomerZipCode='" + CustomerZipCode + '\'' +
+                ", dateUpdated='" + this.getDateUpdated() + '\'' +
                 '}';
     }
 
@@ -84,5 +85,9 @@ public class CustomerRemote extends Customer{
         CustomerState = customerState;
         CustomerZipCode = customerZipCode;
         this.setDateUpdated(dateUpdated);
+    }
+
+    public CustomerRemote() {
+
     }
 }

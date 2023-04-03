@@ -70,6 +70,7 @@ public class CustomerLocal extends Customer {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", zipCode='" + zipCode + '\'' +
+                ", dateUpdated='" + this.getDateUpdated() + '\'' +
                 '}';
     }
 
@@ -94,5 +95,9 @@ public class CustomerLocal extends Customer {
         this.state = state;
         this.zipCode = zipCode;
         this.setDateUpdated(dateUpdated);
+    }
+
+    public CustomerLocal(Long customerID) {
+        this.customerID = customerID;
     }
 }
